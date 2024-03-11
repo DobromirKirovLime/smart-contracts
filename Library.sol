@@ -1,49 +1,31 @@
-/// SPDX-License-Identifier: UNLICENSED
+// SPDX-License-Identifier: GPL-3.0
 pragma solidity ^0.8.0;
 pragma abicoder v2;
 
-import { Ownable } from "@openzeppelin/contracts/access/Ownable.sol";
+import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 
-contract Library is Ownable {
+contract Library is Ownable(msg.sender) {
     struct Book {
         uint id;
         string name;
         uint copies;
     }
 
-    Book public book;
-    Book[] public books;
+    mapping(uint => Book) public books;
 
     function addBook(
         uint id,
         string memory name,
         uint copies
     ) external onlyOwner {
-        book = Book(id, name, copies);
-        books.push(book);
+        books[id] = Book(id, name, copies);
     }
 
     function addCopies(uint id, uint numOfCopies) external onlyOwner {
-        for (uint i = 0; i < books.length; i++) {
-            if (id == books[i].id) {
-                books[i].copies = numOfCopies;
-                break;
-            }
-            continue;
-        }
+        books[id].copies = numOfCopies;
     }
 
     function removeBook(uint id) external onlyOwner {
-        for (uint i = 0; i < books.length; i++) {
-            if (id == books[i].id) {
-                delete books[i + 1];
-                break;
-            }
-            continue;
-        }
+        delete books[id];
     }
-
-    mapping(uint => Book) public booksArray;
-
-    function browseBooks() public view returns (Book[] memory) {}
 }
